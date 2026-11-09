@@ -6,10 +6,10 @@
 
 typedef struct Queue {
         s32   item_size; /* The size of a single item in bytes */
-        s32   number;    /* The number of items in the list */
-        s32   alloc;     /* The number of allocated slots in the list */
+        s32 number;      /* The number of items in the queue */
+        s32 alloc;       /* The number of allocated slots */
         void *data;      /* The data buffer */
-        s32   head_off;  /*  The index offset for the first element */
+        s32 head_off;    /* The slot of the first item */
 } Queue;
 
 /*
@@ -35,8 +35,10 @@ PUB s32 queue_count(Queue *que);
 
 /*
  * Returns a pointer to the item at index (0 = next item to shift), or
- * NULL if index is out of range. The pointer is invalidated by
- * queue_push(), since the buffer may be reallocated.
+ * NULL if index is out of range. The items are stored one after another,
+ * so the pointer to item 0 can be used as an array of queue_count() items.
+ * The pointer is invalidated by queue_push(), since it may move the items
+ * or reallocate the buffer.
  */
 PUB void *queue_get(Queue *que, s32 index);
 

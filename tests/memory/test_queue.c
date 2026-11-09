@@ -13,6 +13,8 @@ extern void test_fifo_order(void);
 extern void test_get(void);
 extern void test_interleaved(void);
 extern void test_clear(void);
+extern void test_move_before_grow(void);
+extern void test_grow_with_offset(void);
 
 /******************************************************************************
  *
@@ -32,6 +34,8 @@ int main(void)
         RUN_TEST(test_get);
         RUN_TEST(test_interleaved);
         RUN_TEST(test_clear);
+        RUN_TEST(test_move_before_grow);
+        RUN_TEST(test_grow_with_offset);
 
         return UNITY_END();
 }
@@ -140,6 +144,67 @@ extern void test_clear(void)
 
         TEST_ASSERT_EQUAL(0, queue_count(&que));
         TEST_ASSERT_EQUAL(0, queue_shift(&que, 1, NULL));
+
+        queue_deinit(&que);
+}
+
+extern void test_move_before_grow(void)
+{
+        s32 items[4] = {1, 2, 3, 4};
+        s32 expected[4] = {3, 4, 1, 2};
+        s32 out[4];
+        void *buf;
+        Queue que;
+
+        queue_init(&que, sizeof(s32), 4);
+        queue_push(&que, 4, items);
+        buf = que.data;
+
+        /* Shifting only moves the head */
+        queue_shift(&que, 2, NULL);
+        TEST_ASSERT_EQUAL(2, que.head_off);
+
+        /* No room at the end, but at the front: move instead of grow */
+        TEST_ASSERT_EQUAL(2, queue_push(&que, 2, items));
+        TEST_ASSERT_EQUAL(0, que.head_off);
+        TEST_ASSERT_EQUAL(4, que.alloc);
+        TEST_ASSERT_EQUAL_PTR(buf, que.data);
+
+        TEST_ASSERT_EQUAL(4, queue_shift(&que, 4, out));
+        TEST_ASSERT_EQUAL_INT32_ARRAY(expected, out, 4);
+
+        /* An empty queue starts at slot 0 again */
+        TEST_ASSERT_EQUAL(0, que.head_off);
+
+        queue_deinit(&que);
+}
+
+extern void test_grow_with_offset(void)
+{
+        s32 items[4] = {1, 2, 3, 4};
+        s32 expected[5] = {2, 3, 4, 1, 2};
+        s32 out[5];
+        s32 *arr;
+        Queue que;
+        s32 i;
+
+        queue_init(&que, sizeof(s32), 4);
+        queue_push(&que, 4, items);
+        queue_shift(&que, 1, NULL);
+
+        /* 3 items + 2 new ones don't fit into 4 slots: grow */
+        TEST_ASSERT_EQUAL(2, queue_push(&que, 2, items));
+        TEST_ASSERT_EQUAL(0, que.head_off);
+        TEST_ASSERT_GREATER_OR_EQUAL(5, que.alloc);
+
+        /* The items are stored one after another */
+        arr = (s32 *)queue_get(&que, 0);
+        for(i = 0; i < 5; i++) {
+                TEST_ASSERT_EQUAL(expected[i], arr[i]);
+        }
+
+        TEST_ASSERT_EQUAL(5, queue_shift(&que, 5, out));
+        TEST_ASSERT_EQUAL_INT32_ARRAY(expected, out, 5);
 
         queue_deinit(&que);
 }

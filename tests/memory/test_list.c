@@ -13,8 +13,8 @@ extern void test_init_invalid(void);
 extern void test_push_get(void);
 extern void test_pop(void);
 extern void test_unshift_shift(void);
-extern void test_wraparound(void);
-extern void test_grow_while_wrapped(void);
+extern void test_contiguous(void);
+extern void test_unshift_grow(void);
 extern void test_mixed_against_reference(void);
 extern void test_clear(void);
 
@@ -36,8 +36,8 @@ int main(void)
         RUN_TEST(test_push_get);
         RUN_TEST(test_pop);
         RUN_TEST(test_unshift_shift);
-        RUN_TEST(test_wraparound);
-        RUN_TEST(test_grow_while_wrapped);
+        RUN_TEST(test_contiguous);
+        RUN_TEST(test_unshift_grow);
         RUN_TEST(test_mixed_against_reference);
         RUN_TEST(test_clear);
 
@@ -155,53 +155,50 @@ extern void test_unshift_shift(void)
         list_deinit(&lst);
 }
 
-extern void test_wraparound(void)
+extern void test_contiguous(void)
 {
-        s32 items[4] = {10, 11, 12, 13};
-        s32 out[4];
+        s32 items[4] = {1, 2, 3, 4};
+        s32 front = 0;
         List lst;
+        s32 *arr;
         s32 i;
 
-        list_init(&lst, sizeof(s32), 4);
+        list_init(&lst, sizeof(s32), 2);
 
-        /* Push and shift repeatedly so the items wrap past the buffer end */
-        for(i = 0; i < 10; i++) {
-                list_push(&lst, 3, items);
-                TEST_ASSERT_EQUAL(3, list_shift(&lst, 3, out));
-                TEST_ASSERT_EQUAL_INT32_ARRAY(items, out, 3);
-        }
-
-        /* A multi-item push and pop across the wrap point */
-        list_push(&lst, 1, &items[0]);
-        list_shift(&lst, 1, NULL);
+        /* Shift and unshift so the items are moved, then grow the buffer */
         list_push(&lst, 4, items);
-        TEST_ASSERT_EQUAL(4, lst.alloc);
-        TEST_ASSERT_EQUAL(4, list_pop(&lst, 4, out));
-        TEST_ASSERT_EQUAL_INT32_ARRAY(items, out, 4);
+        list_shift(&lst, 1, NULL);
+        list_unshift(&lst, 1, &front);
+        list_push(&lst, 4, items);
+
+        /* Item i must be right after item i - 1 */
+        arr = (s32 *)list_get(&lst, 0);
+        for(i = 0; i < list_count(&lst); i++) {
+                TEST_ASSERT_EQUAL_PTR(&arr[i], list_get(&lst, i));
+        }
+        TEST_ASSERT_EQUAL(0, arr[0]);
+        TEST_ASSERT_EQUAL(4, arr[3]);
+        TEST_ASSERT_EQUAL(1, arr[4]);
 
         list_deinit(&lst);
 }
 
-extern void test_grow_while_wrapped(void)
+extern void test_unshift_grow(void)
 {
-        s32 items[4] = {1, 2, 3, 4};
-        s32 extra[3] = {5, 6, 7};
-        s32 expected[7] = {1, 2, 3, 4, 5, 6, 7};
-        s32 out[7];
+        s32 items[3] = {1, 2, 3};
+        s32 front[3] = {-3, -2, -1};
+        s32 expected[6] = {-3, -2, -1, 1, 2, 3};
+        s32 out[6];
         List lst;
 
-        list_init(&lst, sizeof(s32), 4);
+        list_init(&lst, sizeof(s32), 3);
+        list_push(&lst, 3, items);
 
-        /* Move the head forward, then fill so the items wrap */
-        list_push(&lst, 2, items);
-        list_shift(&lst, 2, NULL);
-        list_push(&lst, 4, items);
-
-        /* Growing must keep the order */
-        list_push(&lst, 3, extra);
-        TEST_ASSERT_GREATER_OR_EQUAL(7, lst.alloc);
-        TEST_ASSERT_EQUAL(7, list_shift(&lst, 7, out));
-        TEST_ASSERT_EQUAL_INT32_ARRAY(expected, out, 7);
+        /* Growing at the front must keep the order */
+        TEST_ASSERT_EQUAL(3, list_unshift(&lst, 3, front));
+        TEST_ASSERT_GREATER_OR_EQUAL(6, lst.alloc);
+        TEST_ASSERT_EQUAL(6, list_shift(&lst, 6, out));
+        TEST_ASSERT_EQUAL_INT32_ARRAY(expected, out, 6);
 
         list_deinit(&lst);
 }

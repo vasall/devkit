@@ -7,8 +7,8 @@
 #include <string.h>
 
 /*
- * The list is a ring buffer: item i lives in slot (head_off + i) % alloc.
- * This keeps push/pop at the end and unshift/shift at the front all O(1).
+ * The list is a plain array: item i lives in slot i. Push and pop at the end
+ * are O(1), unshift and shift at the front move all items.
  */
 
 /******************************************************************************
@@ -20,13 +20,7 @@
 /* Pointer to the slot holding item index (0 = first item) */
 LOC u8 *l_slot(List *lst, s32 index);
 
-/* Copy num items starting at item index out of the ring into dst */
-LOC void l_read(List *lst, s32 index, s32 num, void *dst);
-
-/* Copy num items from src into the ring starting at item index */
-LOC void l_write(List *lst, s32 index, s32 num, void *src);
-
-/* Make room for at least min_alloc items, keeping the item order */
+/* Make room for at least min_alloc items */
 LOC s32 l_reserve(List *lst, s32 min_alloc);
 
 /******************************************************************************
@@ -50,7 +44,6 @@ PUB s32 list_init(List *lst, s32 item_size, s32 ini)
         lst->item_size = item_size;
         lst->number = 0;
         lst->alloc = ini;
-        lst->head_off = 0;
 
         return 0;
 }
@@ -68,7 +61,6 @@ PUB void list_deinit(List *lst)
         lst->number = 0;
         lst->alloc = 0;
         lst->data = NULL;
-        lst->head_off = 0;
 }
 
 PUB void list_clear(List *lst)
@@ -79,7 +71,6 @@ PUB void list_clear(List *lst)
         }
 
         lst->number = 0;
-        lst->head_off = 0;
 }
 
 PUB s32 list_count(List *lst)
@@ -118,7 +109,7 @@ PUB s32 list_push(List *lst, s32 num, void *data_in)
                 return -1;
         }
 
-        l_write(lst, lst->number, num, data_in);
+        memcpy(l_slot(lst, lst->number), data_in, num * lst->item_size);
         lst->number += num;
 
         return num;
@@ -132,12 +123,12 @@ PUB s32 list_pop(List *lst, s32 num, void *data_out)
         }
 
         num = MIN(num, lst->number);
+        lst->number -= num;
 
         if(data_out) {
-                l_read(lst, lst->number - num, num, data_out);
+                memcpy(data_out, l_slot(lst, lst->number),
+                       num * lst->item_size);
         }
-
-        lst->number -= num;
 
         return num;
 }
@@ -153,12 +144,10 @@ PUB s32 list_unshift(List *lst, s32 num, void *data_in)
                 return -1;
         }
 
-        /* Move the head back by num slots, wrapping around */
-        lst->head_off = (lst->head_off - num % lst->alloc + lst->alloc) %
-                        lst->alloc;
+        /* Move the existing items back to make room at the front */
+        memmove(l_slot(lst, num), lst->data, lst->number * lst->item_size);
+        memcpy(lst->data, data_in, num * lst->item_size);
         lst->number += num;
-
-        l_write(lst, 0, num, data_in);
 
         return num;
 }
@@ -173,11 +162,12 @@ PUB s32 list_shift(List *lst, s32 num, void *data_out)
         num = MIN(num, lst->number);
 
         if(data_out) {
-                l_read(lst, 0, num, data_out);
+                memcpy(data_out, lst->data, num * lst->item_size);
         }
 
+        /* Move the remaining items to the front */
         lst->number -= num;
-        lst->head_off = lst->number ? (lst->head_off + num) % lst->alloc : 0;
+        memmove(lst->data, l_slot(lst, num), lst->number * lst->item_size);
 
         return num;
 }
@@ -190,31 +180,7 @@ PUB s32 list_shift(List *lst, s32 num, void *data_out)
 
 LOC u8 *l_slot(List *lst, s32 index)
 {
-        s32 slot = (lst->head_off + index) % lst->alloc;
-        return (u8 *)lst->data + slot * lst->item_size;
-}
-
-LOC void l_read(List *lst, s32 index, s32 num, void *dst)
-{
-        s32 start = (lst->head_off + index) % lst->alloc;
-        s32 first = MIN(num, lst->alloc - start);
-        u8 *out = (u8 *)dst;
-
-        /* The range may wrap past the end of the buffer: copy in two parts */
-        memcpy(out, l_slot(lst, index), first * lst->item_size);
-        memcpy(out + first * lst->item_size, lst->data,
-               (num - first) * lst->item_size);
-}
-
-LOC void l_write(List *lst, s32 index, s32 num, void *src)
-{
-        s32 start = (lst->head_off + index) % lst->alloc;
-        s32 first = MIN(num, lst->alloc - start);
-        u8 *in = (u8 *)src;
-
-        memcpy(l_slot(lst, index), in, first * lst->item_size);
-        memcpy(lst->data, in + first * lst->item_size,
-               (num - first) * lst->item_size);
+        return (u8 *)lst->data + index * lst->item_size;
 }
 
 LOC s32 l_reserve(List *lst, s32 min_alloc)
@@ -228,18 +194,13 @@ LOC s32 l_reserve(List *lst, s32 min_alloc)
 
         new_alloc = MAX(lst->alloc * 2, min_alloc);
 
-        if(!(ptr = malloc(new_alloc * lst->item_size))) {
+        if(!(ptr = realloc(lst->data, new_alloc * lst->item_size))) {
                 LOG(LOG_ERROR, "Failed to allocate memory for list");
                 return -1;
         }
 
-        /* Unwrap the items into the new buffer, starting at slot 0 */
-        l_read(lst, 0, lst->number, ptr);
-        free(lst->data);
-
         lst->data = ptr;
         lst->alloc = new_alloc;
-        lst->head_off = 0;
 
         return 0;
 }
