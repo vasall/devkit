@@ -51,7 +51,7 @@ all: $(LIBRARY) $(TEST_BIN)
 
 $(LIBRARY): $(OBJ)
 	@mkdir -p $(dir $@)
-	$(CC) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ -lm
 
 #
 # Library object files
