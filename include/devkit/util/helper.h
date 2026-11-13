@@ -9,6 +9,7 @@
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define CLAMP(v, lo, hi) MAX((lo), MIN((v), (hi)))
 
 /*
  * Round v to exactly 0 if it is closer to 0 than eps, e.g. to remove float
