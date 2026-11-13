@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
+/**
  * Keys and values live in two parallel arrays of capacity slots; key 0 marks
  * an empty slot. Lookups start at the slot given by the mixed key and walk
  * forward until they find the key or an empty slot. The map grows at a load
@@ -153,7 +153,7 @@ PUB s32 hashmap_remove(HashMap *map, u64 key)
                 i = (i + 1) & mask;
         }
 
-        /*
+        /**
          * Backward-shift deletion: move later entries of the same probe run
          * into the hole, so lookups never stop early at a gap.
          */

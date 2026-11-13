@@ -8,7 +8,7 @@
 
 #include <devkit/math/vector/fvector3.h>
 
-/*
+/**
  * Column-major 3×3 matrix layout:
  *
  *   v0   v1   v2

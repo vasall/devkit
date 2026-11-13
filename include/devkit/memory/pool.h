@@ -13,7 +13,7 @@
  *
  ******************************************************************************/
 
-/*
+/**
  * Check if a handle was handed out by a pool. Works for every struct with
  * index and generation fields, so typed handles can use it too. It doesn't
  * tell if the item was removed since; pool_get does.
@@ -29,7 +29,7 @@
  *
  ******************************************************************************/
 
-/*
+/**
  * Refers to an item in a pool. Removing an item bumps the generation of its
  * slot, so old handles stop working instead of reaching a newer item in the
  * same slot. Generation 0 is never used, so a zeroed handle is invalid.
@@ -39,7 +39,7 @@ typedef struct PoolHandle {
         u32 generation;
 } PoolHandle;
 
-/*
+/**
  * Stores items of one size in slots that are reused after removal. The items
  * live in chunks that are never moved, so a pointer to an item stays valid
  * until the item is removed or the pool is freed.
@@ -60,7 +60,7 @@ typedef struct Pool {
  *
  ******************************************************************************/
 
-/*
+/**
  * Initialize an empty pool.
  *
  * @param pool Pointer to the pool
@@ -71,17 +71,17 @@ typedef struct Pool {
  */
 PUB s32 pool_init(Pool *pool, s32 item_size, s32 chunk_items);
 
-/*
+/**
  * Free the pool. The items are not looked at, free what they own first.
  */
 PUB void pool_deinit(Pool *pool);
 
-/*
+/**
  * Make a handle from its parts.
  */
 PUB PoolHandle pool_handle(s32 index, u32 generation);
 
-/*
+/**
  * Add an item, reusing the slot of a removed item if there is one.
  *
  * @param pool Pointer to the pool
@@ -92,7 +92,7 @@ PUB PoolHandle pool_handle(s32 index, u32 generation);
  */
 PUB void *pool_add(Pool *pool, const void *item, PoolHandle *handle_out);
 
-/*
+/**
  * Get an item.
  *
  * @returns A pointer to the item, or NULL if the handle is invalid or the
@@ -100,19 +100,19 @@ PUB void *pool_add(Pool *pool, const void *item, PoolHandle *handle_out);
  */
 PUB void *pool_get(Pool *pool, PoolHandle handle);
 
-/*
+/**
  * Remove an item. Its handle and pointers to it become invalid.
  *
  * @returns 0 on success, -1 if the handle is invalid or already removed
  */
 PUB s32 pool_remove(Pool *pool, PoolHandle handle);
 
-/*
+/**
  * Get the number of items in the pool.
  */
 PUB s32 pool_count(Pool *pool);
 
-/*
+/**
  * Get the number of slots, used or free. Together with pool_at this walks
  * over all items:
  *
@@ -123,7 +123,7 @@ PUB s32 pool_count(Pool *pool);
  */
 PUB s32 pool_slots(Pool *pool);
 
-/*
+/**
  * Get the item in a slot.
  *
  * @param pool Pointer to the pool

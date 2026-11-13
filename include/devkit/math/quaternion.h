@@ -7,7 +7,7 @@
 #include <devkit/math/vector.h>
 #include <devkit/math/matrix.h>
 
-/*
+/**
  * Quaternion q = w + xi + yj + zk
  *
  * Rotation quaternions are unit quaternions. They follow the same convention
@@ -28,7 +28,7 @@ PUB Quaternion quat_identity(void);
 /* ret_q = rotation of rad around axis (axis does not need to be normalized) */
 PUB Quaternion quat_axis_angle(Vector3 axis, f64 rad);
 
-/*
+/**
  * ret_q = qz * qy * qx
  *
  * Rotates around x first, then y, then z (same as Rz * Ry * Rx).

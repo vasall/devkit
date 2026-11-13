@@ -12,7 +12,7 @@
  *
  ******************************************************************************/
 
-/*
+/**
  * A growable UTF-8 text. The buffer always contains valid UTF-8 and is
  * always terminated with a '\0', so it can be passed to C functions directly.
  *
@@ -31,7 +31,7 @@ typedef struct Text {
  *
  ******************************************************************************/
 
-/*
+/**
  * Initialize a text and preallocate memory. Optionally a buffer can be
  * provided, which will be copied into the text.
  *
@@ -45,17 +45,17 @@ typedef struct Text {
  */
 PUB s32 text_init(Text *txt, s32 length, const char *buf);
 
-/*
+/**
  * Free the buffer and reset all fields.
  */
 PUB void text_deinit(Text *txt);
 
-/*
+/**
  * Remove all content. The buffer is kept for reuse.
  */
 PUB void text_clear(Text *txt);
 
-/*
+/**
  * Merge two texts to one new text: txt_out = txt1 + txt2. txt_out must not
  * be initialized yet and has to be freed with text_deinit.
  *
@@ -63,18 +63,18 @@ PUB void text_clear(Text *txt);
  */
 PUB s32 text_merge(Text *txt_out, Text txt1, Text txt2);
 
-/*
+/**
  * Get the text as a '\0'-terminated C string. The pointer stays valid until
  * the text is changed.
  */
 PUB const char *text_cstr(Text *txt);
 
-/*
+/**
  * Get the number of codepoints (characters) in the text.
  */
 PUB s32 text_count(Text *txt);
 
-/*
+/**
  * Get the byte offset of the codepoint at the given index. An index equal to
  * the number of codepoints gives the offset of the end of the text.
  *
@@ -82,7 +82,7 @@ PUB s32 text_count(Text *txt);
  */
 PUB s32 text_offset(Text *txt, s32 index);
 
-/*
+/**
  * Get the codepoint at the given index. Every call walks the text from the
  * start, so use text_next to go through all codepoints.
  *
@@ -94,7 +94,7 @@ PUB s32 text_offset(Text *txt, s32 index);
  */
 PUB s32 text_get(Text *txt, s32 index, u32 *cp_out);
 
-/*
+/**
  * Iterate over the codepoints. Start with *offset = 0, every call returns
  * the codepoint at *offset and moves *offset to the next one.
  *
@@ -106,7 +106,7 @@ PUB s32 text_get(Text *txt, s32 index, u32 *cp_out);
  */
 PUB s32 text_next(Text *txt, s32 *offset, u32 *cp_out);
 
-/*
+/**
  * Append UTF-8 data to the end of the text.
  *
  * @param txt Pointer to the text
@@ -117,14 +117,14 @@ PUB s32 text_next(Text *txt, s32 *offset, u32 *cp_out);
  */
 PUB s32 text_append(Text *txt, const char *buf, s32 len);
 
-/*
+/**
  * Append a single codepoint to the end of the text.
  *
  * @returns 0 on success, -1 on error or if cp is not a valid codepoint
  */
 PUB s32 text_append_cp(Text *txt, u32 cp);
 
-/*
+/**
  * Insert UTF-8 data before the codepoint at the given index. An index equal
  * to the number of codepoints appends to the end.
  *
@@ -137,7 +137,7 @@ PUB s32 text_append_cp(Text *txt, u32 cp);
  */
 PUB s32 text_insert(Text *txt, s32 index, const char *buf, s32 len);
 
-/*
+/**
  * Remove codepoints starting at the given index. If fewer than num
  * codepoints follow the index, everything up to the end is removed.
  *

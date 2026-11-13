@@ -19,12 +19,12 @@
  *
  ******************************************************************************/
 
-/*
+/**
  * Functions to work with UTF-8 data in any char buffer. For a growable text
  * that always holds valid UTF-8, see devkit/memory/text.h.
  */
 
-/*
+/**
  * Decode the codepoint at the start of the buffer. Overlong encodings,
  * surrogates and codepoints above U+10FFFF are rejected.
  *
@@ -37,7 +37,7 @@
  */
 PUB s32 utf8_decode(const char *buf, s32 len, u32 *cp_out);
 
-/*
+/**
  * Encode a codepoint as UTF-8.
  *
  * @param cp The codepoint
@@ -47,7 +47,7 @@ PUB s32 utf8_decode(const char *buf, s32 len, u32 *cp_out);
  */
 PUB s32 utf8_encode(u32 cp, char *buf_out);
 
-/*
+/**
  * Check if the buffer contains only valid UTF-8.
  *
  * @param buf The data
@@ -57,7 +57,7 @@ PUB s32 utf8_encode(u32 cp, char *buf_out);
  */
 PUB s32 utf8_validate(const char *buf, s32 len);
 
-/*
+/**
  * Count the codepoints in a valid UTF-8 buffer.
  *
  * @param buf The data

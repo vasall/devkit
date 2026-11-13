@@ -8,7 +8,7 @@
 
 #include <devkit/math/vector/fvector2.h>
 
-/*
+/**
  * Column-major 2×2 matrix layout:
  *
  *   v0   v1

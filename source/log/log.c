@@ -159,7 +159,7 @@ LOC void s_log_intern(LogLevel lvl, const char *file, s32 line,
 
         s_timestamp(ts);
 
-        /*
+        /**
          * Create the log entry.
          */
         snprintf(buf, sizeof(buf), "[%s] [%s:%d] [%s] %s",
@@ -168,7 +168,7 @@ LOC void s_log_intern(LogLevel lvl, const char *file, s32 line,
                         s_level_name(lvl),
                         msg);
 
-        /*
+        /**
          * Push log entry s32o stderr.
          */
         fprintf(stderr, "%s\n", buf);

@@ -33,7 +33,7 @@ typedef enum LogLevel {
  *
  ******************************************************************************/
 
-/*
+/**
  * Fixed‑argument logging functions
  */
 PUB void log_msg(LogLevel lvl, const char *file, s32 line,
@@ -60,7 +60,7 @@ PUB void log_iiii(LogLevel lvl, const char *file, s32 line,
 PUB void log_p(LogLevel lvl, const char *file, s32 line,
                 const char *fmt, void *p);
 
-/*
+/**
  * Macro wrappers (default level = LOG_INFO)
  */
 #define LOG(lvl, msg) \

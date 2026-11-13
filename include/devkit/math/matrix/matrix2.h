@@ -6,7 +6,7 @@
 
 #include <devkit/math/vector/vector2.h>
 
-/*
+/**
  * Column-major 2×2 matrix layout:
  *
  *   v0   v1

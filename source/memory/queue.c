@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
+/**
  * The queue is a plain array with a head offset: item i lives in slot
  * head_off + i. Shifting only moves the head forward. When a push would run
  * past the end of the buffer, the items are moved back to slot 0 first. The

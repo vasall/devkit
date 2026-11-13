@@ -9,7 +9,7 @@
 #include <devkit/math/vector/fvector3.h>
 #include <devkit/math/vector/fvector4.h>
 
-/*
+/**
  * Column-major 4×4 matrix layout:
  *
  *   v0   v1   v2   v3

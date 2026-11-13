@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
+/**
  * The list is a plain array: item i lives in slot i. Push and pop at the end
  * are O(1), unshift and shift at the front move all items.
  */

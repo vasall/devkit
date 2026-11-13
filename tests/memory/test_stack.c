@@ -3,53 +3,53 @@
 #include <devkit/memory/stack.h>
 
 /******************************************************************************
- * 
+ *
  * 				TEST CASES
  *
  ******************************************************************************/
 
-/*
- * 
+/**
+ *
  */
 extern void test_init_stack(void);
 
-/*
- * 
+/**
+ *
  */
 extern void test_deinit_stack(void);
 
-/*
- * 
+/**
+ *
  */
 extern void test_push_single_items(void);
 
-/*
- * 
+/**
+ *
  */
 extern void test_push_multiple_items(void);
 
-/*
- * 
+/**
+ *
  */
 extern void test_pop_single_items(void);
 
-/*
+/**
  *
  */
 extern void test_pop_multiple_items(void);
 
-/*
+/**
  *
  */
 extern void test_get_items(void);
 
-/*
+/**
  *
  */
 extern void test_clear_stack(void);
 
 /******************************************************************************
- * 
+ *
  * 				TEST RUNNER
  *
  ******************************************************************************/
@@ -74,7 +74,7 @@ int main(void)
 }
 
 /******************************************************************************
- * 
+ *
  * 				TEST FUNCTIONS
  *
  ******************************************************************************/
