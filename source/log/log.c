@@ -162,7 +162,7 @@ LOC void s_log_intern(LogLevel lvl, const char *file, s32 line,
                 char *msg)
 {
         char buf[LOG_ENTRY_LENGTH];
-        char ts[32];
+        char ts[72];
 
         if(lvl == LOG_DEBUG) return;
 

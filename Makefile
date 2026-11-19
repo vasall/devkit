@@ -11,7 +11,7 @@ SRC_DIR   := source
 INC_DIR   := include
 BUILD_DIR := build
 
-CC        ?= cc
+CC        ?= gcc
 CFLAGS    ?= -O2
 CFLAGS    += -Wall -Wextra -pedantic -fPIC
 CPPFLAGS  += -I$(INC_DIR) -MMD -MP
